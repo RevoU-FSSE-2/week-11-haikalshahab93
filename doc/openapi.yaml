@@ -1,0 +1,438 @@
+openapi: '3.0.3'
+info:
+  title: ' Inventory Tracker Management API'
+  version: '1.0.0'
+  description: 'API for managing product requests'
+servers:
+  - url: 'http://localhost:3000'
+    description: 'Local server'
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Enter the token with the word Bearer and a space before it e.g. Bearer xxxxxxxx' 
+  schemas:
+    UserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          pattern: '^[^\s]+$' # no whitespace
+          example: 'user'
+        role:
+          type: string
+          enum: # only allow these values
+            - 'admin'
+            - 'maker'
+            - 'approver'
+        password:
+          type: string
+          minLength: 8 # minimum length of 8
+          pattern: '^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]+$' # alphanumeric
+      required:
+        - username
+        - role
+        - password
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        role:
+          type: string
+          enum:
+            - 'admin'
+            - 'maker'
+            - 'approver'
+        message: 
+          type: string
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          pattern: '^[^\s]+$'
+          example: 'username'
+        password:
+          type: string
+          format: password
+          minLength: 8
+      required:
+        - username
+        - password
+    TransferRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+          enum:
+            - 'USD'
+            - 'EUR'
+            - 'IDR'
+        sourceAccount:
+          type: string
+        destinationAccount:
+          type: string
+    UsersRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum:
+            - 'admin'
+            - 'maker'
+            - 'approver'
+    AllUserResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsersRequest'
+    AllTransferResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferRequest'
+    TransferRequestStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - 'approved'
+            - 'rejected'
+      required:
+        - status
+    ProductRequest:
+      type: object
+      properties:
+        name_product:
+          type: string
+        price:
+          type: number
+          format: float
+        stock:
+          type: number
+          format: float          
+        description:
+          type: string
+
+    AllProductResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRequest' 
+    ProductRequestStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - 'beli'
+            - 'jual'
+        jumlah: 
+          type: number
+          format: float
+      required:
+        - status
+        - jumlah 
+paths:
+  /v1/auth/register:
+    post:
+      tags:
+        - 'User'
+      summary: 'Register a new user'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: 'User created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: 'Invalid request'
+        '409':
+          description: 'User already exists'
+  /v1/auth/login:
+    post:
+      tags:
+        - 'User'
+      summary: 'Login'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: 'User logged in'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: 'Invalid request'
+  /v1/auth/users:
+    get:
+      security:
+        - bearer: []
+      tags:
+        - 'Users Request'
+      summary: 'Get all User requests'
+      responses:
+        '200':
+          description: 'User requests retrieved'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AllUserResponse'
+        '401':
+          description: 'Unauthorized'
+  /v1/transfer:
+    get:
+      security:
+        - bearer: []
+      tags:
+        - 'Transfer Request'
+      summary: 'Get all transfer requests'
+      responses:
+        '200':
+          description: 'Transfer requests retrieved'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AllTransferResponse'
+        '401':
+          description: 'Unauthorized'
+    post:
+      security:
+        - bearer: []
+      tags:
+        - 'Transfer Request'
+      summary: 'Create a new transfer request'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '201':
+          description: 'Transfer request created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRequest'
+        '400':
+          description: 'Invalid request'
+        '401':
+          description: 'Unauthorized'
+  /v1/transfer/{id}:
+    patch:
+      security:
+        - bearer: []
+      tags:
+        - 'Transfer Request'
+      summary: 'Update a transfer request'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: 'Transfer request id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequestStatusUpdate'
+      responses:
+        '200':
+          description: 'Transfer request updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRequest'
+        '400':
+          description: 'Invalid request'
+        '401':
+          description: 'Unauthorized'
+    delete:
+      security:
+        - bearer: []
+      tags:
+        - 'Transfer Request'
+      summary: 'Delete a transfer request'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: 'Transfer request id'
+      responses:
+        '204':
+          description: 'Transfer request deleted'
+        '400':
+          description: 'Invalid request'
+        '401':
+          description: 'Unauthorized'
+  /v1/transfer/history:
+    get:
+      security:
+        - bearer: []
+      tags:
+        - 'Transfer Request'
+      summary: 'Get all transfer requests'
+      parameters:
+        - in: query
+          name: startDate 
+          schema:
+            type: string
+            format: date
+          required: false
+          description: 'Filter by created date'
+        - in: query
+          name: endDate 
+          schema:
+            type: string
+            format: date
+          required: false
+          description: 'Filter by created date'
+        - in: query
+          name: statuses
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - 'pending'
+                - 'approved'
+                - 'rejected'
+          required: false
+          description: 'Filter by statuses'
+      responses:
+        '200':
+          description: 'Transfer requests retrieved'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AllTransferResponse'
+        '401':
+          description: 'Unauthorized'       
+  /v1/product:
+    get:
+      security:
+        - bearer: []
+      tags:
+        - 'Product Request'
+      summary: 'Get all product requests'
+      responses:
+        '200':
+          description: 'Product requests retrieved'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AllProductResponse'
+        '401':
+          description: 'Unauthorized'
+    post:
+      security:
+        - bearer: []
+      tags:
+        - 'Product Request'
+      summary: 'Create a new product request'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: 'Product request created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRequest'
+        '400':
+          description: 'Invalid request'
+        '401':
+          description: 'Unauthorized'
+  /v1/product/{id}:
+    patch:
+      security:
+        - bearer: []
+      tags:
+        - 'Product Request'
+      summary: 'Update a Product request'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: 'Product request id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequestStatusUpdate'
+      responses:
+        '200':
+          description: 'Transfer request updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRequest'
+        '400':
+          description: 'Invalid request'
+        '401':
+          description: 'Unauthorized'
+    delete:
+      security:
+        - bearer: []
+      tags:
+        - 'Product Request'
+      summary: 'Delete a Product request'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: 'Transfer request id'
+      responses:
+        '204':
+          description: 'Transfer request deleted'
+        '400':
+          description: 'Invalid request'
+        '401':
+          description: 'Unauthorized'
