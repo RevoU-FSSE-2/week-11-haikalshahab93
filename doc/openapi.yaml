@@ -229,28 +229,28 @@ paths:
                   $ref: '#/components/schemas/AllTransferResponse'
         '401':
           description: 'Unauthorized'
-    post:
-      security:
-        - bearer: []
-      tags:
-        - 'Transfer Request'
-      summary: 'Create a new transfer request'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TransferRequest'
-      responses:
-        '201':
-          description: 'Transfer request created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransferRequest'
-        '400':
-          description: 'Invalid request'
-        '401':
-          description: 'Unauthorized'
+    # post:
+    #   security:
+    #     - bearer: []
+    #   tags:
+    #     - 'Transfer Request'
+    #   summary: 'Create a new transfer request'
+    #   requestBody:
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: '#/components/schemas/TransferRequest'
+    #   responses:
+    #     '201':
+    #       description: 'Transfer request created'
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/TransferRequest'
+    #     '400':
+    #       description: 'Invalid request'
+    #     '401':
+    #       description: 'Unauthorized'
   # /v1/transfer/{id}:
   #   patch:
   #     security:
