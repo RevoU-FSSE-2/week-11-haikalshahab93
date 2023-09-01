@@ -55,7 +55,6 @@ const deleteProduct = async (req, res, next) => {
     await deleteProductRequest({ db, id: params.id })
     res.status(200).json({ message: "Product request deleted" })
   } catch (error) {
-    console.log('ss')
     next(error)
   }
 }

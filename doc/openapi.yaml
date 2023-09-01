@@ -4,8 +4,8 @@ info:
   version: '1.0.0'
   description: 'API for managing product requests'
 servers:
-  - url: 'http://localhost:3000'
-    description: 'Local server'
+  - url: 'https://week-11-haikalshahab93-production.up.railway.app'
+    description: 'Host server'
 components:
   securitySchemes:
     bearer:
