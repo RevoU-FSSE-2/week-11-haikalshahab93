@@ -251,7 +251,7 @@ paths:
     #       description: 'Invalid request'
     #     '401':
     #       description: 'Unauthorized'
-  # /v1/transfer/{id}:
+  /v1/transfer/{id}:
   #   patch:
   #     security:
   #       - bearer: []
@@ -281,26 +281,26 @@ paths:
   #         description: 'Invalid request'
   #       '401':
   #         description: 'Unauthorized'
-  #   delete:
-  #     security:
-  #       - bearer: []
-  #     tags:
-  #       - 'Transfer Request'
-  #     summary: 'Delete a transfer request'
-  #     parameters:
-  #       - in: path
-  #         name: id
-  #         schema:
-  #           type: string
-  #         required: true
-  #         description: 'Transfer request id'
-  #     responses:
-  #       '204':
-  #         description: 'Transfer request deleted'
-  #       '400':
-  #         description: 'Invalid request'
-  #       '401':
-  #         description: 'Unauthorized'
+    delete:
+      security:
+        - bearer: []
+      tags:
+        - 'Transfer Request'
+      summary: 'Delete a transfer request'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: 'Transfer request id'
+      responses:
+        '204':
+          description: 'Transfer request deleted'
+        '400':
+          description: 'Invalid request'
+        '401':
+          description: 'Unauthorized'
   # /v1/transfer/history:
   #   get:
   #     security:
